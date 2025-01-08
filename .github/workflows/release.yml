@@ -1,0 +1,49 @@
+on:
+  release:
+    types: [published]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout all themes
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Create zip file
+        run: |
+          find . -name .git -exec rm -rf {} +
+          zip -r themes.zip `< valid_themes.txt`
+          zip -r test-themes hyde pico
+          zip -r all-themes.zip .
+      - name: Upload themes
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: themes.zip
+          asset_name: themes.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload test-themes
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: test-themes.zip
+          asset_name: test-themes.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload all-themes
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: all-themes.zip
+          asset_name: all-themes.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

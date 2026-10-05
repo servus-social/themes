@@ -1,0 +1,23 @@
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout all themes
+        uses: actions/checkout@v3
+      - name: Create zip file
+        run: |
+          zip -r themes.zip $(dirname */theme.toml)
+      - name: Upload themes
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: themes.zip
+          asset_name: themes.zip
+          asset_content_type: application/zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
